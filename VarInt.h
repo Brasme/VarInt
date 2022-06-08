@@ -1,6 +1,7 @@
 ﻿
 /* Bent Gramdal, 2022, bent@gramdal.no
- * VarUint - any number of byte representation of integer. Not made for performance but a example on "how to" implement math on any size integers
+ * VarUint - any number of byte representation of integer. Not made for performance but a example on "how to" 
+ * implement math on any size integers, https://github.com/Brasme/VarInt
  * 
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
  * WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR

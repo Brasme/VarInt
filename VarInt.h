@@ -36,8 +36,24 @@ public:
 	VarUint& operator=(const uint64_t& v);
 	VarUint& operator=(const VarUint& o);
 
+	VarUint& Set(const VarUint& o);
+
 	VarUint& operator *=(const VarUint& o);
+	VarUint& operator +=(const VarUint& o);
+	VarUint& operator -=(const VarUint& o);
+	VarUint& operator /=(const VarUint& o);
+	
+	bool operator ==(const VarUint& o) const;
+	inline bool operator !=(const VarUint& o) const { return !operator==(o); }
+	inline bool operator >(const VarUint& o) const { return GreaterThan(o); }
+	inline bool operator >=(const VarUint& o) const { return GreaterThan(o,true); }
+	inline bool operator <(const VarUint& o) const { return !GreaterThan(o,true); }
+	inline bool operator <=(const VarUint& o) const { return !GreaterThan(o); }
+	bool GreaterThan(const VarUint& o,bool orEqual = false) const;
+	bool IsNull() const;
+
 	VarUint& Mul(const VarUint& v);
+	VarUint& Div(const VarUint& v, VarUint* remain=nullptr);
 	VarUint& Add(const VarUint& v);
 	VarUint& Sub(const VarUint& v);
 	VarUint& Scale(const uint8_t v);
@@ -50,27 +66,31 @@ public:
 	VarUint& Or(const VarUint& v);
 	VarUint& Xor(const VarUint& v, bool truncate = true);
 
+	VarUint& Truncate();
+	uint8_t MSB() const;
+
 	operator uint8_t() const;
 	operator uint16_t() const;
 	operator uint32_t() const;
 	operator uint64_t() const;
 	
-	inline VarUint& NumBytesMinimum(const VarUint& v) { return NumBytesMinimum(v.bytes_.size(),false); }
-	VarUint& NumBytesMinimum(size_t n,bool isSigned=false);
+	inline VarUint& SetNumBytesMinimum(const VarUint& v) { return SetNumBytesMinimum(v.bytes_.size(),false); }
+	VarUint& SetNumBytesMinimum(size_t n,bool isSigned=false);
+	inline size_t NumBytes() const { return bytes_.size(); }
 
 	std::string ToStr(const size_t bytes = 0) const;
-protected:
-	VarUint& Mul_v0(const VarUint& v1);
 private:
 	std::vector<uint8_t> bytes_;
 };
 
-VarUint operator *(const VarUint& v1, const VarUint& v2);
-VarUint operator +(const VarUint& v1, const VarUint& v2);
-VarUint operator -(const VarUint& v1, const VarUint& v2);
-VarUint operator !(const VarUint& v1);
-VarUint operator ^(const VarUint& v1, const VarUint& v2);
-VarUint operator &(const VarUint& v1, const VarUint& v2);
-VarUint operator |(const VarUint& v1, const VarUint& v2);
+inline VarUint operator *(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Mul(v2); }
+inline VarUint operator +(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Add(v2); }
+inline VarUint operator -(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Sub(v2); }
+inline VarUint operator /(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Div(v2); }
+inline VarUint operator !(const VarUint& v1) { return VarUint(v1).Not(); }
+inline VarUint operator ~(const VarUint& v1) { return VarUint(v1).Not(); }
+inline VarUint operator ^(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Xor(v2); }
+inline VarUint operator &(const VarUint& v1, const VarUint& v2) { return VarUint(v1).And(v2); }
+inline VarUint operator |(const VarUint& v1, const VarUint& v2) { return VarUint(v1).Or(v2); }
 
 std::ostream& operator<<(std::ostream& os, const VarUint& v);

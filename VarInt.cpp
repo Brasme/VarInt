@@ -71,7 +71,59 @@ VarUint& VarUint::operator=(const uint64_t& v) { uint64_t x = v; while (x) { byt
 
 VarUint& VarUint::operator=(const VarUint& o) { bytes_ = o.bytes_; return *this; }
 
-VarUint& VarUint::operator *=(const VarUint& o) { return Mul(o); }
+VarUint& VarUint::Set(const VarUint& o) { bytes_ = o.bytes_; return *this; }
+
+VarUint& VarUint::operator*=(const VarUint& o) { return Mul(o); }
+VarUint& VarUint::operator+=(const VarUint& o) { return Add(o); }
+VarUint& VarUint::operator-=(const VarUint& o) { return Sub(o); }
+VarUint& VarUint::operator/=(const VarUint& o) { return Div(o); }
+
+bool VarUint::operator==(const VarUint& o) const
+{
+	auto it1 = bytes_.begin();
+	auto it2 = o.bytes_.begin();
+	auto itEnd1 = bytes_.end();
+	auto itEnd2 = o.bytes_.end();
+	while (it1 != itEnd1 && it2 != itEnd2) {
+		if (*it1++ != *it2++)
+			return false;
+	}
+	return (it1 == itEnd1 && it2 == itEnd2);
+}
+
+bool VarUint::GreaterThan(const VarUint& o,bool orEqual) const
+{
+	const uint8_t* v1 = bytes_.data();
+	const uint8_t* v2 = o.bytes_.data();
+	size_t n1 = bytes_.size();
+	size_t n2 = o.bytes_.size();
+	while (n1 > n2) {
+		n1--;
+		if (v1[n1])
+			return true;
+	}
+	while (n1 > 0) {
+		n1--;
+		n2--;
+		const uint8_t val1 = v1[n1];
+		const uint8_t val2 = v2[n2];
+		if (val1 > val2)
+			return true;
+		if (val1 != val2)
+			return false;
+	}
+	return orEqual;
+}
+
+bool VarUint::IsNull() const
+{
+	if (bytes_.empty())
+		return true;
+	for (auto it = bytes_.begin(); it != bytes_.end(); ++it)
+		if (*it != 0)
+			return false;
+	return true;
+}
 
 VarUint& VarUint::Mul(const VarUint& v) {
 	const size_t n0 = bytes_.size();
@@ -107,7 +159,40 @@ VarUint& VarUint::Mul(const VarUint& v) {
 	return *this;
 }
 
-VarUint& VarUint::Mul_v0(const VarUint& v) {
+VarUint& VarUint::Div(const VarUint& v,VarUint *remainReturn)
+{
+	VarUint divisor(v);
+	VarUint remain(*this);
+	int i = 0;
+	size_t n_r = divisor.Truncate().NumBytes();
+	size_t n = Truncate().NumBytes();
+	if (n > n_r) {
+		i = (int)(n - n_r);
+		divisor.LShift(i * 8);
+	}
+	bytes_.resize((size_t)i + 1, 0);
+	while (remain >= divisor && i >= 0) {
+		uint8_t digit = remain.MSB() / divisor.MSB();
+		VarUint factor;
+		factor.Set(divisor).Scale(digit);
+		while (digit > 0 && factor > remain) {
+			digit--;
+			factor.Sub(divisor);
+		}
+		bytes_[i--] = digit;
+		remain.Sub(factor);
+		divisor.RShift(8);
+	}
+	while (i > 0)
+		bytes_[i--] = 0;	
+	Truncate();
+	if (remainReturn)
+		*remainReturn = remain;
+	return *this;
+}
+
+#ifdef OLD
+VarUint& VarUint::Mul(const VarUint& v) {
 	const size_t n0 = bytes_.size();
 	const size_t n1 = v.bytes_.size();
 	const uint8_t* d0 = bytes_.data();
@@ -152,6 +237,7 @@ VarUint& VarUint::Mul_v0(const VarUint& v) {
 	std::swap(bytes_, result);
 	return *this;
 }
+#endif
 
 VarUint& VarUint::Add(const VarUint& v)
 {
@@ -196,7 +282,7 @@ VarUint& VarUint::Sub(const VarUint& v)
 	if (v.bytes_.size() > n)
 		n = v.bytes_.size();
 	
-	Add(VarUint(v).NumBytesMinimum(n).Not(false).PlusOne());	
+	Add(VarUint(v).SetNumBytesMinimum(n).Not(false).PlusOne());	
 	bytes_.resize(n); // Cuts the additional 1 byte added as result of "2's compliment" add
 
 	size_t nTrunc = 0;
@@ -448,6 +534,20 @@ VarUint& VarUint::Xor(const VarUint& v, bool truncate)
 	return *this;
 }
 
+VarUint& VarUint::Truncate()
+{
+	size_t nTrunc = 0;
+	for (auto it = bytes_.begin(); it != bytes_.end(); ++it) {
+		if (*it) nTrunc = 0;
+		else ++nTrunc;		
+	}
+	if (nTrunc)
+		bytes_.resize(bytes_.size() - nTrunc);
+	return *this;
+}
+
+uint8_t VarUint::MSB() const { return bytes_.empty() ? 0 : bytes_.back(); }
+
 VarUint::operator uint8_t() const {
 	return bytes_.empty() ? 0 : bytes_.front();
 }
@@ -482,7 +582,7 @@ VarUint::operator uint64_t() const {
 	return v;
 }
 
-VarUint& VarUint::NumBytesMinimum(size_t n,bool isSigned)
+VarUint& VarUint::SetNumBytesMinimum(size_t n,bool isSigned)
 {
 	if (n <= bytes_.size())
 		return *this;	
@@ -520,30 +620,6 @@ std::string VarUint::ToStr(const size_t bytes) const {
 	return s;
 }
 
-VarUint operator *(const VarUint& v1, const VarUint& v2) { 
-	return VarUint(v1).Mul(v2); 
-}
-VarUint operator +(const VarUint& v1, const VarUint& v2) { 
-	return VarUint(v1).Add(v2); 
-}
-VarUint operator -(const VarUint& v1, const VarUint& v2) {
-	return VarUint(v1).Sub(v2);
-}
-VarUint operator !(const VarUint& v1) {
-	return VarUint(v1).Not();
-}
-VarUint operator ~(const VarUint& v1) {
-	return VarUint(v1).Not();
-}
-VarUint operator ^(const VarUint& v1, const VarUint& v2) {
-	return VarUint(v1).Xor(v2);
-}
-VarUint operator &(const VarUint& v1, const VarUint& v2) {
-	return VarUint(v1).And(v2);
-}
-VarUint operator |(const VarUint& v1, const VarUint& v2) {
-	return VarUint(v1).Or(v2);
-}
 
 std::ostream& operator<<(std::ostream& os, const VarUint& v) { 
 	std::ios_base::fmtflags f(os.flags());

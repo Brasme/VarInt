@@ -1,5 +1,6 @@
 // Plans: Could use gtest. If anyone find it useful its fine - added permission in VarInt.h/.cpp
 
+#include "VarInt_Test.h"
 #include "VarInt.h"
 
 #include <iostream>

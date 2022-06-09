@@ -1,12 +1,10 @@
-#include "BigIntTest.h"
-#include "VarIntTest.h"
+#include "VarInt_Test.h"
 
 #include <iostream>
 
 int main()
 {  
-	std::cout << "\nBigInt and VarInt tests\n-----------------------------------------\n";
-	BigIntTest();
+	std::cout << "\nVarInt tests\n-----------------------------------------\n";
 	VarIntTest();
 	return 0;
 }

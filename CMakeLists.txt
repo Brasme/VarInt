@@ -2,11 +2,20 @@
 
 cmake_minimum_required (VERSION 3.8)
 
-project (BigInt)
+project (VarInt)
 
-add_library (BigInt "BigIntTest.cpp" "BigIntTest.h" "BigInt.cpp" "BigInt.h")
-add_library (VarInt "VarIntTest.cpp" "VarIntTest.h" "VarInt.cpp" "VarInt.h")
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+add_subdirectory("submodules/googletest")
 
-add_executable (BigAndVarIntTest main.cpp)
-target_link_libraries(BigAndVarIntTest BigInt VarInt)
+add_library (VarIntLib "VarInt.cpp" "VarInt.h")
+
+add_executable (VarInt_Test main.cpp "VarInt_Test.cpp" "VarInt_Test.h" )
+target_link_libraries(VarInt_Test VarIntLib)
+
+enable_testing()
+# add_test(NAME VarInt_GTest)
+add_executable(VarInt_GTest VarInt_GTest.cpp)
+target_link_libraries(VarInt_GTest VarIntLib GTest::gtest)
+
+
 

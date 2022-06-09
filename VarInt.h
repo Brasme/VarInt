@@ -51,6 +51,7 @@ public:
 	inline bool operator <=(const VarUint& o) const { return !GreaterThan(o); }
 	bool GreaterThan(const VarUint& o,bool orEqual = false) const;
 	bool IsNull() const;
+	static const VarUint& Null();
 
 	VarUint& Mul(const VarUint& v);
 	VarUint& Div(const VarUint& v, VarUint* remain=nullptr);
@@ -74,9 +75,11 @@ public:
 	operator uint32_t() const;
 	operator uint64_t() const;
 	
-	inline VarUint& SetNumBytesMinimum(const VarUint& v) { return SetNumBytesMinimum(v.bytes_.size(),false); }
-	VarUint& SetNumBytesMinimum(size_t n,bool isSigned=false);
-	inline size_t NumBytes() const { return bytes_.size(); }
+	uint64_t UintFromDigits(size_t fromDigit,size_t toDigit=0) const;
+
+	inline VarUint& SetNumDigitsMinimum(const VarUint& v) { return SetNumDigitsMinimum(v.bytes_.size(),false); }
+	VarUint& SetNumDigitsMinimum(size_t n,bool isSigned=false);
+	inline size_t NumDigits() const { return bytes_.size(); }
 
 	std::string ToStr(const size_t bytes = 0) const;
 private:

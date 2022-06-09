@@ -125,6 +125,12 @@ bool VarUint::IsNull() const
 	return true;
 }
 
+const VarUint& VarUint::Null()
+{
+	static VarUint null;
+	return null;
+}
+
 VarUint& VarUint::Mul(const VarUint& v) {
 	const size_t n0 = bytes_.size();
 	const size_t n1 = v.bytes_.size();
@@ -164,20 +170,31 @@ VarUint& VarUint::Div(const VarUint& v,VarUint *remainReturn)
 	VarUint divisor(v);
 	VarUint remain(*this);
 	int i = 0;
-	size_t n_r = divisor.Truncate().NumBytes();
-	size_t n = Truncate().NumBytes();
-	if (n > n_r) {
-		i = (int)(n - n_r);
+	const size_t n_d = divisor.Truncate().NumDigits();
+	const size_t n_r = remain.Truncate().NumDigits();
+	if (n_r > n_d) {
+		i = (int)(n_r - n_d);
 		divisor.LShift(i * 8);
 	}
+	
+	size_t numDigitsSeed=3;
+	if (numDigitsSeed>n_d)
+		numDigitsSeed = n_d;
+	uint64_t digitDivisor= v.UintFromDigits(n_d - numDigitsSeed);
+	
 	bytes_.resize((size_t)i + 1, 0);
-	while (remain >= divisor && i >= 0) {
-		uint8_t digit = remain.MSB() / divisor.MSB();
+
+	
+	while (remain >= v && i >= 0) {		
+		uint8_t digit=0;
+		if (remain.NumDigits() >= divisor.NumDigits())
+			digit = (uint8_t)(remain.UintFromDigits(divisor.NumDigits() - numDigitsSeed) / digitDivisor);
 		VarUint factor;
 		factor.Set(divisor).Scale(digit);
 		while (digit > 0 && factor > remain) {
 			digit--;
-			factor.Sub(divisor);
+			factor.Set(divisor).Scale(digit); 
+			// factor.Sub(divisor);
 		}
 		bytes_[i--] = digit;
 		remain.Sub(factor);
@@ -282,7 +299,7 @@ VarUint& VarUint::Sub(const VarUint& v)
 	if (v.bytes_.size() > n)
 		n = v.bytes_.size();
 	
-	Add(VarUint(v).SetNumBytesMinimum(n).Not(false).PlusOne());	
+	Add(VarUint(v).SetNumDigitsMinimum(n).Not(false).PlusOne());	
 	bytes_.resize(n); // Cuts the additional 1 byte added as result of "2's compliment" add
 
 	size_t nTrunc = 0;
@@ -582,7 +599,28 @@ VarUint::operator uint64_t() const {
 	return v;
 }
 
-VarUint& VarUint::SetNumBytesMinimum(size_t n,bool isSigned)
+uint64_t VarUint::UintFromDigits(size_t fromDigit,size_t toDigit) const
+{
+	uint64_t v = 0;
+	size_t pos = 0;
+	size_t i = 0;
+	
+	auto it = bytes_.begin(); 
+	while (pos < fromDigit && it != bytes_.end()) {
+		++it;
+		++pos;
+	}
+	while (i<64 && (toDigit==0 || pos<toDigit) && it!=bytes_.end()) {
+		v |= ((uint64_t)(*it++)) << i;
+		i += 8;
+		++pos;
+	}
+	return v;
+
+	return uint64_t();
+}
+
+VarUint& VarUint::SetNumDigitsMinimum(size_t n,bool isSigned)
 {
 	if (n <= bytes_.size())
 		return *this;	

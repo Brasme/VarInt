@@ -291,6 +291,12 @@ void VarIntTest()
 
 	std::cout << "\nTest8-Div:\n";
 	{
+		std::cout << "         (uint64_t)(VarUint(0x123456789abcdef123456789abcdef123456)) / 0x123  =" << Hex<>((uint64_t)(VarUint("0x123456789abcdef123456789abcdef123456")) / 0x123) << std::endl;
+		std::cout << " VarUint(0x123456789abcdef123456789abcdef123456)/ VarUint(0x123) =" << (VarUint("0x123456789abcdef123456789abcdef123456") / VarUint("0x123")) << std::endl;
+
+		std::cout << "         0x1234       /         0x12345  =" << Hex<>(0x1234ull  / 0x12345) << std::endl;
+		std::cout << " VarUint(0x1234)      / VarUint(0x12345) =" << (VarUint("0x1234")  / VarUint("0x12345")) << std::endl;
+		
 		std::cout << "         0x12345      /         0x12345  =" << Hex<>(0x12345ull / 0x12345) << std::endl;
 		std::cout << " VarUint(0x12345)     / VarUint(0x12345) =" << (VarUint("0x12345") / VarUint("0x12345")) << std::endl;
 		
@@ -318,6 +324,10 @@ void VarIntTest()
 		std::cout << "         0x123456789abcd /         0x12345  =" << Hex<>(0x123456789abcdull / 0x12345) << std::endl;
 		std::cout << " VarUint(0x123456789abcd)/ VarUint(0x12345) =" << (VarUint("0x123456789abcd") / VarUint("0x12345")) << std::endl;
 
+		std::cout << "         0x123456789abcd /         0x123  =" << Hex<>(0x123456789abcdull / 0x123) << std::endl;
+		std::cout << " VarUint(0x123456789abcd)/ VarUint(0x123) =" << (VarUint("0x123456789abcd") / VarUint("0x123")) << std::endl;
+
+		
 		VarUint remain;
 
 	}

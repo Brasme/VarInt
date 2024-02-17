@@ -75,13 +75,14 @@ public:
 	operator uint32_t() const;
 	operator uint64_t() const;
 	
-	uint64_t UintFromDigits(size_t fromDigit,size_t toDigit=0) const;
+	uint64_t UintFromBytes(size_t fromDigit,size_t toDigit=0) const;
 
-	inline VarUint& SetNumDigitsMinimum(const VarUint& v) { return SetNumDigitsMinimum(v.bytes_.size(),false); }
-	VarUint& SetNumDigitsMinimum(size_t n,bool isSigned=false);
-	inline size_t NumDigits() const { return bytes_.size(); }
+	inline VarUint& SetNumBytesMinimum(const VarUint& v) { return SetNumBytesMinimum(v.bytes_.size(),false); }
+	VarUint& SetNumBytesMinimum(size_t n,bool isSigned=false);
+	inline size_t NumBytes() const { return bytes_.size(); }
 
-	std::string ToStr(const size_t bytes = 0) const;
+	std::string ToHexStr(const size_t bytes = 0) const;
+	std::string ToDecStr() const;
 private:
 	std::vector<uint8_t> bytes_;
 };

@@ -18,6 +18,7 @@
  */
 
 #include "VarInt.h"
+#include <sstream>
 
 static uint8_t char2hex(const char ch) {
 	if (ch < '0')
@@ -102,6 +103,11 @@ bool VarUint::GreaterThan(const VarUint& o,bool orEqual) const
 		if (v1[n1])
 			return true;
 	}
+	while (n2 > n1) {
+		n2--;
+		if (v2[n2])
+			return false;
+	}
 	while (n1 > 0) {
 		n1--;
 		n2--;
@@ -170,33 +176,35 @@ VarUint& VarUint::Div(const VarUint& v,VarUint *remainReturn)
 	VarUint divisor(v);
 	VarUint remain(*this);
 	int i = 0;
-	const size_t n_d = divisor.Truncate().NumDigits();
-	const size_t n_r = remain.Truncate().NumDigits();
+	const size_t n_d = divisor.Truncate().NumBytes();
+	const size_t n_r = remain.Truncate().NumBytes();
 	if (n_r > n_d) {
 		i = (int)(n_r - n_d);
 		divisor.LShift(i * 8);
 	}
 	
-	size_t numDigitsSeed=3;
-	if (numDigitsSeed>n_d)
-		numDigitsSeed = n_d;
-	uint64_t digitDivisor= v.UintFromDigits(n_d - numDigitsSeed);
+	size_t numBytesSeed=3;
+	if (numBytesSeed>n_d)
+		numBytesSeed = n_d;
+	uint64_t byteDivisor= v.UintFromBytes(n_d - numBytesSeed);
 	
 	bytes_.resize((size_t)i + 1, 0);
 
-	
-	while (remain >= v && i >= 0) {		
-		uint8_t digit=0;
-		if (remain.NumDigits() >= divisor.NumDigits())
-			digit = (uint8_t)(remain.UintFromDigits(divisor.NumDigits() - numDigitsSeed) / digitDivisor);
+	if (remain<v) {
+		while (i >= 0)
+			bytes_[i--] = 0;
+	} else while (remain >= v && i >= 0) {		
+		uint8_t byteValue=0;
+		if (remain.NumBytes() >= divisor.NumBytes())
+			byteValue = (uint8_t)(remain.UintFromBytes(divisor.NumBytes() - numBytesSeed) / byteDivisor);
 		VarUint factor;
-		factor.Set(divisor).Scale(digit);
-		while (digit > 0 && factor > remain) {
-			digit--;
-			factor.Set(divisor).Scale(digit); 
+		factor.Set(divisor).Scale(byteValue);
+		while (byteValue > 0 && factor > remain) {
+			byteValue--;
+			factor.Set(divisor).Scale(byteValue); 
 			// factor.Sub(divisor);
 		}
-		bytes_[i--] = digit;
+		bytes_[i--] = byteValue;
 		remain.Sub(factor);
 		divisor.RShift(8);
 	}
@@ -299,7 +307,7 @@ VarUint& VarUint::Sub(const VarUint& v)
 	if (v.bytes_.size() > n)
 		n = v.bytes_.size();
 	
-	Add(VarUint(v).SetNumDigitsMinimum(n).Not(false).PlusOne());	
+	Add(VarUint(v).SetNumBytesMinimum(n).Not(false).PlusOne());	
 	bytes_.resize(n); // Cuts the additional 1 byte added as result of "2's compliment" add
 
 	size_t nTrunc = 0;
@@ -599,18 +607,18 @@ VarUint::operator uint64_t() const {
 	return v;
 }
 
-uint64_t VarUint::UintFromDigits(size_t fromDigit,size_t toDigit) const
+uint64_t VarUint::UintFromBytes(size_t fromByteIdx,size_t toByteIdx) const
 {
 	uint64_t v = 0;
 	size_t pos = 0;
 	size_t i = 0;
 	
 	auto it = bytes_.begin(); 
-	while (pos < fromDigit && it != bytes_.end()) {
+	while (pos < fromByteIdx && it != bytes_.end()) {
 		++it;
 		++pos;
 	}
-	while (i<64 && (toDigit==0 || pos<toDigit) && it!=bytes_.end()) {
+	while (i<64 && (toByteIdx==0 || pos<toByteIdx) && it!=bytes_.end()) {
 		v |= ((uint64_t)(*it++)) << i;
 		i += 8;
 		++pos;
@@ -620,7 +628,7 @@ uint64_t VarUint::UintFromDigits(size_t fromDigit,size_t toDigit) const
 	return uint64_t();
 }
 
-VarUint& VarUint::SetNumDigitsMinimum(size_t n,bool isSigned)
+VarUint& VarUint::SetNumBytesMinimum(size_t n,bool isSigned)
 {
 	if (n <= bytes_.size())
 		return *this;	
@@ -635,7 +643,7 @@ VarUint& VarUint::SetNumDigitsMinimum(size_t n,bool isSigned)
 	return *this;	
 }
 
-std::string VarUint::ToStr(const size_t bytes) const {
+std::string VarUint::ToHexStr(const size_t bytes) const {
 	static const char* hexChar = "0123456789ABCDEF";
 	size_t m = bytes_.size() * 2;
 	if (m != 0) {
@@ -658,10 +666,30 @@ std::string VarUint::ToStr(const size_t bytes) const {
 	return s;
 }
 
+std::string VarUint::ToDecStr() const 
+{
+	std::vector<char> stack;
+	VarUint v=*this;
+	if (v.IsNull())
+		stack.push_back('0');
+	else while (!v.IsNull()) {		
+		VarUint remain;
+		v.Div(10,&remain);
+		stack.push_back(('0'+(uint8_t)remain));
+	}
+	
+	std::string valStr(stack.size(),'\0');
+	auto it=valStr.rbegin();
+	for (auto ch : stack)
+		*it++=ch;
+
+	return valStr;
+
+}
 
 std::ostream& operator<<(std::ostream& os, const VarUint& v) { 
 	std::ios_base::fmtflags f(os.flags());
-	os << v.ToStr();
+	os << v.ToHexStr();
 	os.flags(f);	
 	return os; 
 }

@@ -7,10 +7,13 @@ project (VarInt)
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 add_subdirectory("submodules/googletest")
 
-add_library (VarIntLib "VarInt.cpp" "VarInt.h")
+add_library (VarIntLib VarInt.cpp VarInt.h)
 
-add_executable (VarInt_Test main.cpp "VarInt_Test.cpp" "VarInt_Test.h" )
+add_executable (VarInt_Test main.cpp VarInt_Test.cpp VarInt_Test.h )
 target_link_libraries(VarInt_Test VarIntLib)
+
+add_executable (CalculatePrimes CalculatePrimes.cpp)
+target_link_libraries(CalculatePrimes VarIntLib)
 
 enable_testing()
 # add_test(NAME VarInt_GTest)

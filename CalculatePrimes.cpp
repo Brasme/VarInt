@@ -46,7 +46,7 @@ void example() {
     VarUint v6 = v5 * v5 * v5 * v5;
     cout << "v6=v5^4=" << v6 << '(' << v6.ToDecStr() << "), bytes=" << v6.NumBytes() << endl;
 
-
+    // Test against results from https://defuse.ca/big-number-calculator.htm
     {
         string expected="0x515A2C6AF8EE07C49953E663D0DE040CB5C823F2A2621C5B356E5D01";
         string result=v6.ToHexStr();
@@ -56,74 +56,6 @@ void example() {
             "       != '" << expected << "'\n";
     }
     
-    // VarUint remain;
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // cout                     << __LINE__ << "v6/10 => " << "0x8229e0ab27e33fa0f5530a394e30067abc736cb76a3693c5224a2e6\n";
-
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // cout                     << __LINE__ << "v6/10 => " << "0xd0430111d96b99018884dd287d19a3f793ebe12576bdb93b6a104a\n";
-
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
-    // v6.Div(10,&remain); cout << __LINE__ << "v6/10 => " << v6 << ',' << remain << "\n";
     
     {
         string expected="8567390854443331688706960582058466394167047921945064008730712890625";
